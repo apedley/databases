@@ -57,6 +57,7 @@ $(function() {
       });
     },
     fetch: function(animate) {
+      app.stopSpinner();
       $.ajax({
         url: app.server,
         type: 'GET',

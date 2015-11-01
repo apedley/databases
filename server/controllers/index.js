@@ -1,20 +1,42 @@
 var models = require('../models');
 var bluebird = require('bluebird');
+var db = require('../db');
+
 
 
 module.exports = {
   messages: {
     get: function (req, res) {
-      models.messages.get().then(function(data) {
-        // console.dir('logging data: ' + JSON.stringify(data));
-        sendResponse(res, data);
-      }).error(function(err) {
-        console.error(err);
-      });
+      db.Message.findAll(  { include: [db.User, db.Room] })
+        .then(function(results){
+           sendResponse(res, results);
+          // res.json(results);
+        });
+      // models.messages.get().then(function(data) {
+      //   // console.dir('logging data: ' + JSON.stringify(data));
+      //   sendResponse(res, data);
+      // }).error(function(err) {
+      //   console.error(err);
+      // });
     }, // a function which handles a get request for all messages
     post: function (req, res) {
-      models.messages.post(req.body);
-      sendResponse(res, req.body);
+      var params = {
+        body: req.body.body
+      };
+      db.User.findOrCreate( {where: { username: req.body.user }})
+        .then(function(user){
+          params['userid'] = user.id;
+          db.Room.findOrCreate( { where: {name: req.body.roomname }})
+            .then(function(room){
+              params['roomid'] = room.id;
+              db.Message.create( params ) 
+                .then(function(message) {
+                  console.log('created message');
+                });
+            });
+        });
+      // // models.messages.post(req.body);
+      // sendResponse(res, req.body);
     } 
   },
   // rooms: {get,post}

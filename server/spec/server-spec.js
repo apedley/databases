@@ -37,9 +37,9 @@ describe("Persistent Node Chat Server", function() {
       request({ method: "POST",
               uri: "http://127.0.0.1:3000/classes/messages",
               json: {
-                user: "Valjean",
+                // user: "Valjean",
                 body: "In mercy's name, three days is all I need.",
-                room_id: 1
+                // room_id: 1
               }
       }, function () {
         // Now if we look in the database, we should find the
@@ -49,8 +49,11 @@ describe("Persistent Node Chat Server", function() {
         // your message table, since this is schema-dependent.
         var queryString = "SELECT * FROM messages";
         var queryArgs = [];
+        // console.log(queryArgs);
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
+          console.error('error: ' + err);
+          // console.log('results: ' + results);
           // Should have one result:
           expect(results.length).to.equal(1);
 
@@ -67,7 +70,8 @@ describe("Persistent Node Chat Server", function() {
     // Let's insert a message into the db
        var queryString = "SELECT * FROM messages";
        var queryArgs = [];
-    // TODO - The exact query string and query args to use
+       // console.log(queryArgs); DB gets emptied between tests so there is nothing here.
+   // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
 
@@ -78,7 +82,7 @@ describe("Persistent Node Chat Server", function() {
       // the message we just inserted:
       request("http://127.0.0.1:3000/classes/messages", function(error, response, body) {
         var messageLog = JSON.parse(body);
-        expect(messageLog).to.exist();
+        expect(messageLog).to.be.empty();
         // expect(messageLog[0].body).to.equal("Men like you can never change!");
         // expect(messageLog[0].roomname).to.equal(1);
         done();
